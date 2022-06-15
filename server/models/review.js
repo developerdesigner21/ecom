@@ -31,7 +31,7 @@ const ReviewSchema = new Schema({
   },
   status: {
     type: String,
-    default: 'Waiting Approval',
+    default: 'Approved',
     enum: ['Waiting Approval', 'Rejected', 'Approved']
   },
   updated: Date,

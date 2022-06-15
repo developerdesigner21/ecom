@@ -7,6 +7,8 @@
 import {
   HANDLE_CART,
   ADD_TO_CART,
+  USER_CART_SET,
+  CART_ITEM_QANTITY_CHANGE,
   REMOVE_FROM_CART,
   HANDLE_CART_TOTAL,
   SET_CART_ID,
@@ -25,12 +27,45 @@ const cartReducer = (state = initialState, action) => {
 
   switch (action.type) {
     case ADD_TO_CART:
+      const isProductAvailable = state.cartItems.find(cartItem=>cartItem._id===action.payload._id)
+      if(isProductAvailable){
+        const data = state.cartItems.filter(cartItem=>cartItem._id!==action.payload._id)
+        const qantity = action.payload.quantity+isProductAvailable.quantity
+        const newProduct = {...action.payload,quantity:qantity,totalPrice:action.payload.price*qantity}
+        newState = {
+          ...state,
+          cartItems: [...data, newProduct]
+        };
+      }else{
+        newState = {
+          ...state,
+          cartItems: [...state.cartItems, action.payload],
+          itemsInCart: [...state.itemsInCart, action.payload._id]
+        };
+      }
+
+      localStorage.setItem('cart_items', JSON.stringify(newState.cartItems));
+      localStorage.setItem(
+        'items_in_cart',
+        JSON.stringify(newState.itemsInCart)
+      );
+      return newState;
+    
+    case CART_ITEM_QANTITY_CHANGE:
+      const dataIndex = state.cartItems.findIndex((item)=>item._id===action.payload._id)
+      state.cartItems[dataIndex].quantity =  action.payload.quantity
+      state.cartItems[dataIndex].totalPrice =  action.payload.totalPrice
+      state = state
+      localStorage.setItem('cart_items', JSON.stringify(state.cartItems));
+      return state;
+
+    case USER_CART_SET:
+      const uniqueProductId = [...new Set(action.payload.map(item => item._id))];
       newState = {
         ...state,
-        cartItems: [...state.cartItems, action.payload],
-        itemsInCart: [...state.itemsInCart, action.payload._id]
+        cartItems: action.payload,
+        itemsInCart: uniqueProductId
       };
-
       localStorage.setItem('cart_items', JSON.stringify(newState.cartItems));
       localStorage.setItem(
         'items_in_cart',

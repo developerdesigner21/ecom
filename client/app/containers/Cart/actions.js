@@ -11,6 +11,8 @@ import axios from 'axios';
 import {
   HANDLE_CART,
   ADD_TO_CART,
+  USER_CART_SET,
+  CART_ITEM_QANTITY_CHANGE,
   REMOVE_FROM_CART,
   HANDLE_CART_TOTAL,
   SET_CART_ID,
@@ -28,13 +30,18 @@ import { toggleCart } from '../Navigation/actions';
 
 // Handle Add To Cart
 export const handleAddToCart = product => {
-  return (dispatch, getState) => {
+  return async (dispatch, getState) => {
     product.quantity = Number(getState().product.productShopData.quantity);
     product.totalPrice = product.quantity * product.price;
     product.totalPrice = parseFloat(product.totalPrice.toFixed(2));
     const inventory = getState().product.storeProduct.inventory;
 
-    const result = calculatePurchaseQuantity(inventory);
+    const isProductAvailableCart =await getState().cart.cartItems.find(item=>item._id===product._id)
+    const result = isProductAvailableCart ? calculatePurchaseQuantity(inventory) - isProductAvailableCart.quantity : calculatePurchaseQuantity(inventory);
+
+    if(result===0){
+      return dispatch({ type: SET_PRODUCT_SHOP_FORM_ERRORS, payload: {quantity: ['Max quantity already added on cart.']} });
+    }
 
     const rules = {
       quantity: `min:1|max:${result}`
@@ -47,18 +54,31 @@ export const handleAddToCart = product => {
 
     if (!isValid) {
       return dispatch({ type: SET_PRODUCT_SHOP_FORM_ERRORS, payload: errors });
+    }else{
+      // dispatch({
+      //   type: RESET_PRODUCT_SHOP
+      // });
+      dispatch({
+        type: ADD_TO_CART,
+        payload: product
+      });
+      dispatch(calculateCartTotal());
+      dispatch(toggleCart());
+      dispatch(push('/shop'))
+      dispatch(cartStoreInUser());
     }
+  };
+};
 
+export const handleCartItemCountChange = (product,quantity) => {
+  return async (dispatch, getState) => {
+    product = {...product,quantity:quantity,totalPrice:product.price*quantity}
     dispatch({
-      type: RESET_PRODUCT_SHOP
-    });
-
-    dispatch({
-      type: ADD_TO_CART,
+      type: CART_ITEM_QANTITY_CHANGE,
       payload: product
     });
     dispatch(calculateCartTotal());
-    dispatch(toggleCart());
+    // dispatch(cartStoreInUser());
   };
 };
 
@@ -70,6 +90,7 @@ export const handleRemoveFromCart = product => {
       payload: product
     });
     dispatch(calculateCartTotal());
+    dispatch(cartStoreInUser());
     // dispatch(toggleCart());
   };
 };
@@ -154,6 +175,42 @@ export const getCartId = () => {
   };
 };
 
+//store cart in db in user table
+export const cartStoreInUser = () => {
+  return async (dispatch, getState) => {
+    try {
+      if(getState().authentication.authenticated){
+        const cartItems = getState().cart.cartItems;
+        const products = cartItems;
+        await axios.post(`/api/cart/userCartAdd`, { products });
+      }
+    } catch (error) {
+      handleError(error, dispatch);
+    }
+  };
+};
+
+//on login cart bind with current cart
+export const userCartBind = () => {
+  return async (dispatch, getState) => {
+    try {
+      const response = await axios.get(`/api/user`);
+      const cartItems = getState().cart.cartItems;
+
+      const ids = new Set(cartItems.map(d => d._id));
+      const newCart = [...cartItems, ...response.data.user.cartItems.filter(d => !ids.has(d._id))];  
+
+      dispatch({
+        type: USER_CART_SET,
+        payload: newCart 
+      });
+      dispatch(cartStoreInUser());
+    } catch (error) {
+      handleError(error, dispatch);
+    }
+  };
+};
+
 export const setCartId = cartId => {
   return (dispatch, getState) => {
     dispatch({
@@ -173,6 +230,7 @@ export const clearCart = () => {
     dispatch({
       type: CLEAR_CART
     });
+    dispatch(cartStoreInUser());
   };
 };
 
@@ -191,13 +249,14 @@ const getCartItems = cartItems => {
 };
 
 const calculatePurchaseQuantity = inventory => {
-  if (inventory <= 25) {
-    return 1;
-  } else if (inventory > 25 && inventory <= 100) {
-    return 5;
-  } else if (inventory > 100 && inventory < 500) {
-    return 25;
-  } else {
-    return 50;
-  }
+  return parseInt(inventory / 2);
+  // if (inventory <= 25) {
+  //   return 1;
+  // } else if (inventory > 25 && inventory <= 100) {
+  //   return 5;
+  // } else if (inventory > 100 && inventory < 500) {
+  //   return 25;
+  // } else {
+  //   return 50;
+  // }
 };

@@ -10,9 +10,10 @@ import { Link } from 'react-router-dom';
 import { Container, Row, Col } from 'reactstrap';
 
 import Button from '../../Common/Button';
+import Input from '../../Common/Input';
 
 const CartList = props => {
-  const { cartItems, handleRemoveFromCart } = props;
+  const { cartItems, handleRemoveFromCart, handleCartItemCountChange } = props;
 
   const handleProductClick = () => {
     props.toggleCart();
@@ -59,18 +60,30 @@ const CartList = props => {
               </Row>
               <Row className='mb-2 align-items-center'>
                 <Col xs='9'>
-                  <p className='item-label'>price</p>
+                  <p className='item-label'>Price per unit</p>
                 </Col>
                 <Col xs='3' className='text-right'>
-                  <p className='value price'>{` $${item?.totalPrice}`}</p>
+                  <p className='value price'>{` $${item?.price}`}</p>
                 </Col>
               </Row>
               <Row className='mb-2 align-items-center'>
-                <Col xs='9'>
+                <Col xs='6'>
                   <p className='item-label'>quantity</p>
                 </Col>
-                <Col xs='3' className='text-right'>
-                  <p className='value quantity'>{` ${item.quantity}`}</p>
+                <Col xs='6' className='text-right d-flex justify-content-end'>
+                    <Input
+                        type={'qantity'}
+                        name={'quantity'}
+                        disabled={true}
+                        decimals={false}
+                        min={1}
+                        max={item.inventory/2}
+                        placeholder={'Product Quantity'}
+                        value={item.quantity}
+                        onInputChange={(name, value) => {
+                          handleCartItemCountChange(item,value)
+                        }}
+                      />
                 </Col>
               </Row>
             </Container>

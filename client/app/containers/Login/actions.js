@@ -18,7 +18,7 @@ import {
 import { setAuth, clearAuth } from '../Authentication/actions';
 import setToken from '../../utils/token';
 import handleError from '../../utils/error';
-import { clearCart } from '../Cart/actions';
+import { clearCart, userCartBind, cartStoreInUser } from '../Cart/actions';
 import { clearAccount } from '../Account/actions';
 import { allFieldsValidation } from '../../utils/validation';
 
@@ -72,7 +72,7 @@ export const login = () => {
 
       dispatch(setAuth());
       dispatch(success(successfulOptions));
-
+      dispatch(userCartBind());
       dispatch({ type: LOGIN_RESET });
     } catch (error) {
       const title = `Please try to login again!`;
@@ -91,6 +91,7 @@ export const signOut = () => {
       position: 'tr',
       autoDismiss: 1
     };
+    dispatch(cartStoreInUser());
 
     dispatch(clearAuth());
     dispatch(clearAccount());
@@ -99,6 +100,6 @@ export const signOut = () => {
     localStorage.removeItem('token');
 
     dispatch(success(successfulOptions));
-    // dispatch(clearCart());
+    dispatch(clearCart());
   };
 };

@@ -1,7 +1,7 @@
 // header styles
 .header-info {
   padding: 10px 0px;
-  background-color: $theme-light-black;
+  background-color: $primary-color;
 
   .fa,
   span {
@@ -136,7 +136,7 @@
   .brand {
     @include flex();
     flex-wrap: wrap;
-    align-items: flex-start;
+    align-items: center;
     @include media-breakpoint-down(sm) {
       margin-top: 10px;
       justify-content: center;

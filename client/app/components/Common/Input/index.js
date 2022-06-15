@@ -4,7 +4,7 @@
  *
  */
 
-import React from 'react';
+import React, { useEffect ,useState } from 'react';
 import ReactStars from 'react-rating-stars-component';
 
 const Input = props => {
@@ -25,6 +25,11 @@ const Input = props => {
     onInputChange,
     inlineElement
   } = props;
+
+  let [count, setCount] = useState(Number(value));
+  useEffect(()=>{
+    setCount(Number(value))
+  } , [value]);
 
   const _onChange = e => {
     if (e.target.name == 'image') {
@@ -82,6 +87,54 @@ const Input = props => {
           placeholder={placeholder}
           className={'input-number'}
         />
+        <span className='invalid-message'>{error && error[0]}</span>
+      </div>
+    );
+  } else if (type === 'qantity') {
+    const styles = `input-box${error ? ' invalid' : ''}`;
+    const handleOnInput = e => {
+      if (!decimals) {
+        e.target.value = e.target.value.replace(/[^0-9]*/g, '');
+        setCount(e.target.value)
+      }else{
+        setCount(e.target.value)
+      }
+    };
+    const handlePlus =() =>{
+      count = Number(count) + 1;
+      setCount(count);
+      onInputChange(name,count)
+    }
+    const handleMinus =() =>{
+      count = count === 1 ? 1 : count - 1;
+      setCount(count);
+      onInputChange(name,count)
+    }
+
+    return (
+      <div className={styles}>
+        {label && <label>{label}</label>}
+        <div className='d-flex'>
+        <i className='icon-plus icon-qantity' aria-hidden='true' onClick={() => handlePlus()}/>
+        <input
+          autoComplete={autoComplete}
+          value={count}
+          step='step'
+          min={min || 0}
+          max={max || null}
+          pattern='[0-9]'
+          onInput={handleOnInput}
+          type={type}
+          onChange={e => {
+            _onChange(e);
+          }}
+          disabled={disabled}
+          name={name}
+          placeholder={placeholder}
+          className={'input-qantity'}
+        />
+        <i className='icon-minus icon-qantity' onClick={() => handleMinus()} aria-hidden='true' />
+        </div>
         <span className='invalid-message'>{error && error[0]}</span>
       </div>
     );

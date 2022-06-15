@@ -22,7 +22,7 @@ const List = props => {
           className='d-flex flex-column justify-content-center align-items-center fw-1 text-white avatar'
           style={{ backgroundColor: color ? color : 'red' }}
         >
-          {review.user.firstName.charAt(0)}
+          {review.user.firstName.charAt(0).toUpperCase()}{review.user.lastName.charAt(0).toUpperCase()}
         </div>
       );
     }

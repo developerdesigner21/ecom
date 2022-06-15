@@ -105,7 +105,7 @@ class ProductPage extends React.PureComponent {
                     </div>
                     <div className='item-customize'>
                       <Input
-                        type={'number'}
+                        type={'qantity'}
                         error={shopFormErrors['quantity']}
                         label={'Quantity'}
                         name={'quantity'}
@@ -126,7 +126,20 @@ class ProductPage extends React.PureComponent {
                       <SocialShare product={product} />
                     </div>
                     <div className='item-actions'>
-                      {itemsInCart.includes(product._id) ? (
+                        <Button
+                          variant='primary'
+                          disabled={
+                            product.quantity <= 0 && !shopFormErrors['quantity']
+                          }
+                          text='Add To Bag'
+                          className='bag-btn'
+                          icon={<BagIcon />}
+                          onClick={() => {
+                            handleAddToCart(product)
+                          }}
+                          />
+
+                      {/* {itemsInCart.includes(product._id) ? (
                         <Button
                           variant='primary'
                           disabled={
@@ -149,7 +162,7 @@ class ProductPage extends React.PureComponent {
                           icon={<BagIcon />}
                           onClick={() => handleAddToCart(product)}
                         />
-                      )}
+                      )} */}
                     </div>
                   </div>
                 </div>

@@ -6,6 +6,7 @@ const Cart = require('../../models/cart');
 const Product = require('../../models/product');
 const auth = require('../../middleware/auth');
 const store = require('../../utils/store');
+const User = require('../../models/user');
 
 router.post('/add', auth, async (req, res) => {
   try {
@@ -71,6 +72,26 @@ router.delete('/delete/:cartId/:productId', auth, async (req, res) => {
     const query = { _id: req.params.cartId };
 
     await Cart.updateOne(query, { $pull: { products: product } }).exec();
+
+    res.status(200).json({
+      success: true
+    });
+  } catch (error) {
+    res.status(400).json({
+      error: 'Your request could not be processed. Please try again.'
+    });
+  }
+});
+
+router.post('/userCartAdd', auth, async (req, res) => {
+  try {
+    const user = req.user._id;
+    const update = {cartItems : req.body.products};
+    const query = { _id: user };
+
+    await User.findOneAndUpdate(query, update, {
+      new: true
+    });
 
     res.status(200).json({
       success: true

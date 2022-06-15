@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
     const reviews = await Review.find({})
       .populate({
         path: 'user',
-        select: 'firstName'
+        select: 'firstName lastName'
       })
       .populate({
         path: 'product',
@@ -68,7 +68,7 @@ router.get('/:slug', async (req, res) => {
     })
       .populate({
         path: 'user',
-        select: 'firstName'
+        select: 'firstName lastName'
       })
       .sort('-created');
 
