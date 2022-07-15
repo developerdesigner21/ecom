@@ -128,7 +128,7 @@ class Sell extends React.PureComponent {
               >
                 <img
                   className='agreement-banner'
-                  src={'/images/banners/agreement.svg'}
+                  src={'/images/banners/agreement.jpg'}
                   alt='agreement banner'
                 />
               </Col>

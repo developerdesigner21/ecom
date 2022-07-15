@@ -188,7 +188,7 @@ export const placeOrder = () => {
       });
     }
 
-    dispatch(toggleCart());
+    // dispatch(toggleCart());
   };
 };
 

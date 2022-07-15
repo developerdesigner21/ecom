@@ -76,7 +76,7 @@ class RangeSlider extends React.Component {
         ) : (
           <Range
             className='slider'
-            pushable={100}
+            pushable={50}
             min={1}
             max={500}
             marks={marks}

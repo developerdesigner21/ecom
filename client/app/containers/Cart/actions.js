@@ -147,11 +147,20 @@ export const handleCheckout = () => {
   };
 };
 
+export const MoveToCheckout = () => {
+  return (dispatch, getState) => {
+    dispatch(toggleCart());
+    dispatch(push('/checkout'));
+  };
+};
+
 // Continue shopping use case
-export const handleShopping = () => {
+export const handleShopping = (isCartToggle = true) => {
   return (dispatch, getState) => {
     dispatch(push('/shop'));
-    dispatch(toggleCart());
+    if(isCartToggle){
+      dispatch(toggleCart());
+    }
   };
 };
 
